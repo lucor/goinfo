@@ -10,7 +10,9 @@ It aims to help with issue reporting answering the following questions:
 
 ## Installation
 
-        go get github.com/lucor/goinfo/cmd/goinfo
+```
+$ go get github.com/lucor/goinfo/cmd/goinfo
+```
 
 ## Usage
 
@@ -28,7 +30,9 @@ Options:
 
 ### Text format output
 
-   goinfo
+```
+$ goinfo
+```
 
 ```
 ## Go version info
@@ -82,11 +86,12 @@ GOFLAGS=""
 
 This format could be useful when reporting issues on services that support the HTML details tag like github or gitlab
 
-        goinfo -format html
+```
+$ goinfo -format html
+```
 
 The report will look like:
 
-## Go version info
 <details><summary>Go version info</summary><br><pre>
 version=go1.14 linux/amd64
 </pre></details>
@@ -138,7 +143,10 @@ GOFLAGS=
 
 ### JSON format output
 
-   goinfo -format json
+
+```
+$ goinfo -format json
+```
 
 ```
 [
