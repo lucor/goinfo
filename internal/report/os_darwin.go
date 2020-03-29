@@ -10,15 +10,41 @@ import (
 
 // Info returns the collected info
 func (i *OS) Info() (map[string]interface{}, error) {
+	info, err := i.swVers()
+	if err != nil {
+		return nil, err
+	}
+
+	arch, err := i.architecture()
+	if err != nil {
+		return info, err
+	}
+	info["architecture"] = arch
+
+	kernel, err := i.kernel()
+	if err != nil {
+		return info, err
+	}
+	info["kernel"] = kernel
+	return info, err
+}
+
+func (i *OS) swVers() (map[string]interface{}, error) {
 	cmd := exec.Command("sw_vers")
 	out, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("could not detect os info using sw_vers command: %w", err)
 	}
-	return i.parseCmdOutput(out)
+	return i.parseSwVersCmdOutput(out)
 }
 
-func (i *OS) parseCmdOutput(data []byte) (map[string]interface{}, error) {
+func (i *OS) parseSwVersCmdOutput(data []byte) (map[string]interface{}, error) {
+	// fitlerKeys defines the key to return
+	filterKeys := map[string]string{
+		"ProductName":    "name",
+		"ProductVersion": "version",
+		"BuildVersion":   "build_version",
+	}
 	info := map[string]interface{}{}
 	buf := bytes.NewBuffer(data)
 	scanner := bufio.NewScanner(buf)
@@ -27,7 +53,35 @@ func (i *OS) parseCmdOutput(data []byte) (map[string]interface{}, error) {
 		if len(tokens) != 2 {
 			continue
 		}
-		info[tokens[0]] = strings.Trim(tokens[1], "\t ")
+		key, ok := filterKeys[tokens[0]]
+		if !ok {
+			continue
+		}
+		info[key] = strings.Trim(tokens[1], "\t ")
 	}
 	return info, scanner.Err()
+}
+
+func (i *OS) architecture() (string, error) {
+	cmd := exec.Command("uname", "-m")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("could not detect architecture using uname command: %w", err)
+	}
+
+	info := strings.Trim(string(out), "\n")
+
+	return info, nil
+}
+
+func (i *OS) kernel() (string, error) {
+	cmd := exec.Command("uname", "-rsv")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("could not detect the kernel using uname command: %w", err)
+	}
+
+	info := strings.Trim(string(out), "\n")
+
+	return info, nil
 }
