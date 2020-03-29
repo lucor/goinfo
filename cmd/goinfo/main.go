@@ -12,9 +12,8 @@ import (
 )
 
 var (
-	workDir    string
-	modulePath string
-	formatOut  string
+	workDir   string
+	formatOut string
 )
 
 func main() {
