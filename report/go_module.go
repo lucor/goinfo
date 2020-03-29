@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/lucor/goinfo"
 	"golang.org/x/mod/modfile"
 )
 
@@ -33,7 +34,7 @@ func (i *GoMod) Summary() string {
 }
 
 // Info returns the collected info
-func (i *GoMod) Info() (map[string]interface{}, error) {
+func (i *GoMod) Info() (goinfo.Info, error) {
 	// Start to look for go module into WorkDir
 	info, err := getModInfo(i.Module, i.WorkDir)
 	if info == nil && i.Module != "" {
@@ -45,9 +46,9 @@ func (i *GoMod) Info() (map[string]interface{}, error) {
 }
 
 // getModInfo returns info about module in dir
-func getModInfo(module string, searchDir string) (map[string]interface{}, error) {
+func getModInfo(module string, searchDir string) (goinfo.Info, error) {
 
-	info := map[string]interface{}{
+	info := goinfo.Info{
 		// module is the module found in searchDir, if any
 		"module": module,
 		// path	 is the directory where the module is found
@@ -114,7 +115,7 @@ func vcsInfo(workDir string) (string, error) {
 		}
 		return info, nil
 	}
-	return "", fmt.Errorf("no supported VCS found in %s", workDir)
+	return "", nil
 }
 
 // gitInfo returns the "human-readable" commit name using git describe

@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+
+	"github.com/lucor/goinfo"
 )
 
 // Info returns the collected info about the OS
-func (i *OS) Info() (map[string]interface{}, error) {
+func (i *OS) Info() (goinfo.Info, error) {
 	cmd := exec.Command("cmd", "/C", "wmic os get /value")
 	out, err := cmd.Output()
 	if err != nil {
@@ -19,14 +21,14 @@ func (i *OS) Info() (map[string]interface{}, error) {
 	return i.parseWmicCmdOutput(out)
 }
 
-func (i *OS) parseWmicCmdOutput(data []byte) (map[string]interface{}, error) {
+func (i *OS) parseWmicCmdOutput(data []byte) (goinfo.Info, error) {
 	// fitlerKeys defines the key to return
 	filterKeys := map[string]string{
 		"Caption":        "name",
 		"Version":        "version",
 		"OSArchitecture": "architecture",
 	}
-	info := map[string]interface{}{}
+	info := goinfo.Info{}
 	buf := bytes.NewBuffer(data)
 	scanner := bufio.NewScanner(buf)
 	for scanner.Scan() {

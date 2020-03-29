@@ -6,8 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/lucor/goinfo/internal/format"
-	"github.com/lucor/goinfo/internal/report"
+	"github.com/lucor/goinfo"
+	"github.com/lucor/goinfo/format"
+	"github.com/lucor/goinfo/report"
 )
 
 var (
@@ -24,45 +25,36 @@ func main() {
 
 	module := flag.Arg(0)
 
-	var w format.Writer
+	var f goinfo.Formatter
 	switch formatOut {
 	case "text":
-		w = &format.Text{}
+		f = &format.Text{}
 	case "html":
-		w = &format.HTMLDetails{}
+		f = &format.HTMLDetails{}
 	case "json":
-		w = &format.JSON{}
+		f = &format.JSON{}
 	default:
-		fmt.Println("Invalid value for the format flag:", formatOut)
+		fmt.Fprintln(os.Stderr, "Invalid value for the format flag:", formatOut)
 		os.Exit(1)
 	}
 
 	workDir, err := ensureWorkDir(workDir)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 
-	reporters := []report.Reporter{
+	reporters := []goinfo.Reporter{
 		&report.GoVersion{},
 		&report.GoMod{WorkDir: workDir, Module: module},
 		&report.OS{},
 		&report.GoEnv{},
 	}
 
-	reports := []report.Report{}
-	for _, reporter := range reporters {
-		reports = append(reports, report.Generate(reporter))
-	}
-
-	w.Write(os.Stdout, reports)
-
-	// display errors, if any
-	for _, report := range reports {
-		err := report.Error
-		if err != "" {
-			fmt.Fprintf(os.Stderr, "[WARN] Report %q: %s\n", report.Summary, err)
-		}
+	err = goinfo.Write(os.Stdout, reporters, f)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
 	}
 }
 

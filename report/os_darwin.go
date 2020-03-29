@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+
+	"github.com/lucor/goinfo"
 )
 
 // Info returns the collected info
-func (i *OS) Info() (map[string]interface{}, error) {
+func (i *OS) Info() (goinfo.Info, error) {
 	info, err := i.swVers()
 	if err != nil {
 		return nil, err
@@ -29,7 +31,7 @@ func (i *OS) Info() (map[string]interface{}, error) {
 	return info, err
 }
 
-func (i *OS) swVers() (map[string]interface{}, error) {
+func (i *OS) swVers() (goinfo.Info, error) {
 	cmd := exec.Command("sw_vers")
 	out, err := cmd.Output()
 	if err != nil {
@@ -38,14 +40,14 @@ func (i *OS) swVers() (map[string]interface{}, error) {
 	return i.parseSwVersCmdOutput(out)
 }
 
-func (i *OS) parseSwVersCmdOutput(data []byte) (map[string]interface{}, error) {
+func (i *OS) parseSwVersCmdOutput(data []byte) (goinfo.Info, error) {
 	// fitlerKeys defines the key to return
 	filterKeys := map[string]string{
 		"ProductName":    "name",
 		"ProductVersion": "version",
 		"BuildVersion":   "build_version",
 	}
-	info := map[string]interface{}{}
+	info := goinfo.Info{}
 	buf := bytes.NewBuffer(data)
 	scanner := bufio.NewScanner(buf)
 	for scanner.Scan() {
@@ -69,9 +71,9 @@ func (i *OS) architecture() (string, error) {
 		return "", fmt.Errorf("could not detect architecture using uname command: %w", err)
 	}
 
-	info := strings.Trim(string(out), "\n")
+	arch := strings.Trim(string(out), "\n")
 
-	return info, nil
+	return arch, nil
 }
 
 func (i *OS) kernel() (string, error) {
@@ -81,7 +83,7 @@ func (i *OS) kernel() (string, error) {
 		return "", fmt.Errorf("could not detect the kernel using uname command: %w", err)
 	}
 
-	info := strings.Trim(string(out), "\n")
+	kernel := strings.Trim(string(out), "\n")
 
-	return info, nil
+	return kernel, nil
 }

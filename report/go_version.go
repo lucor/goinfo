@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+
+	"github.com/lucor/goinfo"
 )
 
 // GoVersion collects the info about the Go version using the go version command
@@ -15,7 +17,7 @@ func (i *GoVersion) Summary() string {
 }
 
 // Info returns the collected info
-func (i *GoVersion) Info() (map[string]interface{}, error) {
+func (i *GoVersion) Info() (goinfo.Info, error) {
 	cmd := exec.Command("go", "version")
 	out, err := cmd.Output()
 	if err != nil {
@@ -23,6 +25,6 @@ func (i *GoVersion) Info() (map[string]interface{}, error) {
 	}
 
 	s := strings.TrimRight(string(out), "\n")
-	info := map[string]interface{}{"version": string(s[11:])}
+	info := goinfo.Info{"version": string(s[11:])}
 	return info, nil
 }

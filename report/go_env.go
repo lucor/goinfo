@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+
+	"github.com/lucor/goinfo"
 )
 
 // GoEnv collects the info about the Go environment using the go env tool
@@ -15,13 +17,14 @@ func (i *GoEnv) Summary() string {
 }
 
 // Info returns the collected info
-func (i *GoEnv) Info() (map[string]interface{}, error) {
+func (i *GoEnv) Info() (goinfo.Info, error) {
+	var info goinfo.Info
 	cmd := exec.Command("go", "env", "-json")
 	out, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("could not detect go env info: %w", err)
 	}
-	var info map[string]interface{}
+
 	err = json.Unmarshal(out, &info)
 	if err != nil {
 		return nil, fmt.Errorf("could not decode the go env json info: %w", err)

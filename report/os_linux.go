@@ -8,10 +8,12 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/lucor/goinfo"
 )
 
 // Info returns the collected info
-func (i *OS) Info() (map[string]interface{}, error) {
+func (i *OS) Info() (goinfo.Info, error) {
 	info, err := i.osRelease()
 	if err != nil {
 		return nil, err
@@ -31,7 +33,7 @@ func (i *OS) Info() (map[string]interface{}, error) {
 	return info, err
 }
 
-func (i *OS) osRelease() (map[string]interface{}, error) {
+func (i *OS) osRelease() (goinfo.Info, error) {
 	releaseFiles := []string{"/etc/os-release"}
 	if matches, err := filepath.Glob("/etc/*release"); err != nil {
 		releaseFiles = append(releaseFiles, matches...)
@@ -50,14 +52,14 @@ func (i *OS) osRelease() (map[string]interface{}, error) {
 	return nil, fmt.Errorf("could not found any release file: %#+v", releaseFiles)
 }
 
-func (i *OS) parseOsReleaseCmdOutput(data []byte) (map[string]interface{}, error) {
+func (i *OS) parseOsReleaseCmdOutput(data []byte) (goinfo.Info, error) {
 	// fitlerKeys defines the key to return
 	filterKeys := map[string]string{
 		"NAME":     "name",
 		"VERSION":  "version",
 		"HOME_URL": "home_url",
 	}
-	info := map[string]interface{}{}
+	info := goinfo.Info{}
 	buf := bytes.NewBuffer(data)
 	scanner := bufio.NewScanner(buf)
 	for scanner.Scan() {
