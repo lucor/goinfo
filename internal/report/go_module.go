@@ -119,7 +119,7 @@ func vcsInfo(workDir string) (string, error) {
 
 // gitInfo returns the "human-readable" commit name using git describe
 func gitInfo(workDir string) (string, error) {
-	cmd := exec.Command("git", "describe", "--tags", "--dirty")
+	cmd := exec.Command("git", "describe", "--tags", "--dirty", "--always")
 	cmd.Dir = workDir
 	out, err := cmd.CombinedOutput()
 	s := strings.Trim(string(out), "\n")
