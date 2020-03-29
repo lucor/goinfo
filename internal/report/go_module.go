@@ -19,9 +19,9 @@ const (
 // GoMod returns the info about a Go module
 // The info returned are defined into goModInfo
 type GoMod struct {
-	//ModulePath is the module path to look for into WorkDir and GOPATH as fallback.
+	//Module is the module to look for into WorkDir and GOPATH as fallback.
 	// If not specified the module present in WorkDir will be returned, if any.
-	ModulePath string
+	Module string
 	// WorkDir is the directory where to look for the go module. If not
 	// specified, default to current directory.
 	WorkDir string
@@ -35,11 +35,11 @@ func (i *GoMod) Summary() string {
 // Info returns the collected info
 func (i *GoMod) Info() (map[string]interface{}, error) {
 	// Start to look for go module into WorkDir
-	info, err := getModInfo(i.ModulePath, i.WorkDir)
-	if info == nil && i.ModulePath != "" {
+	info, err := getModInfo(i.Module, i.WorkDir)
+	if info == nil && i.Module != "" {
 		// try to fallback with GOPATH
-		path := filepath.Join(build.Default.GOPATH, "src", i.ModulePath)
-		info, err = getModInfo(i.ModulePath, path)
+		path := filepath.Join(build.Default.GOPATH, "src", i.Module)
+		info, err = getModInfo(i.Module, path)
 	}
 	return info, err
 }
@@ -48,7 +48,7 @@ func (i *GoMod) Info() (map[string]interface{}, error) {
 func getModInfo(module string, searchDir string) (map[string]interface{}, error) {
 
 	info := map[string]interface{}{
-		// module is the module path found in searchDir, if any
+		// module is the module found in searchDir, if any
 		"module": module,
 		// path	 is the directory where the module is found
 		"path": searchDir,

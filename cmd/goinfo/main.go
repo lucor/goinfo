@@ -19,9 +19,10 @@ var (
 func main() {
 	flag.Usage = printHelp
 	flag.StringVar(&workDir, "work-dir", "", "")
-	flag.StringVar(&modulePath, "module-path", "", "")
 	flag.StringVar(&formatOut, "format", "text", "")
 	flag.Parse()
+
+	module := flag.Arg(0)
 
 	var w format.Writer
 	switch formatOut {
@@ -44,7 +45,7 @@ func main() {
 
 	reporters := []report.Reporter{
 		&report.GoVersion{},
-		&report.GoMod{WorkDir: workDir, ModulePath: modulePath},
+		&report.GoMod{WorkDir: workDir, Module: module},
 		&report.OS{},
 		&report.GoEnv{},
 	}
@@ -82,12 +83,12 @@ func ensureWorkDir(workDir string) (string, error) {
 
 func printHelp() {
 	fmt.Print(`goinfo:
-Provides info about a Go project and the development environment
-Usage:
-  goinfo [options...]
+
+Usage: goinfo [options...] [module]
+  List information about a Go module and the development environment.
+  Default for the module in current directory.
 Options:
   -work-dir         Path of the working dir. Default to current dir
-  -module-path      Go module path to detect info. Default to the module defined in work-dir
   -format           Format output for the report. Supported: text, html, json. Default to text
   -help             Display this help text
 `)
