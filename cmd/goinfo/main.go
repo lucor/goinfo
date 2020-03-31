@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 
 	"github.com/lucor/goinfo"
 	"github.com/lucor/goinfo/format"
@@ -14,13 +15,25 @@ import (
 var (
 	workDir   string
 	formatOut string
+	version   bool
 )
 
 func main() {
 	flag.Usage = printHelp
 	flag.StringVar(&workDir, "work-dir", "", "")
 	flag.StringVar(&formatOut, "format", "text", "")
+	flag.BoolVar(&version, "version", false, "")
 	flag.Parse()
+
+	if version {
+		info, ok := debug.ReadBuildInfo()
+		if !ok {
+			fmt.Fprintln(os.Stderr, "could not retrieve version information")
+			os.Exit(1)
+		}
+		fmt.Println("goinfo version", info.Main.Version)
+		os.Exit(0)
+	}
 
 	module := flag.Arg(0)
 
@@ -81,6 +94,7 @@ Usage: goinfo [options...] [module]
 Options:
   -work-dir         Path of the working dir. Default to current dir
   -format           Format output for the report. Supported: text, html, json. Default to text
+  -version          Display the version
   -help             Display this help text
 `)
 	os.Exit(0)
