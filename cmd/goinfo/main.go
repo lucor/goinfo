@@ -28,7 +28,7 @@ func main() {
 	if version {
 		info, ok := debug.ReadBuildInfo()
 		if !ok {
-			fmt.Fprintln(os.Stderr, "could not retrieve version information")
+			fmt.Fprintln(os.Stderr, "Could not retrieve version information. Please ensure module support is activated and build again.")
 			os.Exit(1)
 		}
 		fmt.Println("goinfo version", info.Main.Version)
