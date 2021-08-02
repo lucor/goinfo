@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/lucor/goinfo"
+	"golang.org/x/sys/execabs"
 )
 
 // Info returns the collected info
